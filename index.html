@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Anniversary Surprise</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { 
+            background: #111; 
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden; /* Prevent scrolling before unzip */
+            color: #1a1a1a;
+        }
+
+        /* --- The Bag (Outer Cover) --- */
+        .experience-container { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            overflow: hidden; 
+            z-index: 50;
+            transition: visibility 1.2s;
+        }
+
+        .gucci-pattern {
+            background-color: #8b7355; /* Base brown */
+            background-image: 
+                radial-gradient(#4a3b2c 15%, transparent 16%),
+                radial-gradient(#4a3b2c 15%, transparent 16%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.5);
+        }
+
+        .bag-half { 
+            position: absolute; 
+            top: 0; 
+            height: 100%; 
+            width: 50%; 
+            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1); 
+            z-index: 2; 
+        }
+
+        .left-side { 
+            left: 0; 
+            transform-origin: left; 
+        }
+        
+        .right-side { 
+            right: 0; 
+            transform-origin: right; 
+        }
+        
+        .stripe-left {
+            position: absolute;
+            right: 0;
+            width: 40px;
+            height: 100%;
+            background: linear-gradient(to right, #004d2c 0%, #004d2c 60%, #a81c1c 60%, #a81c1c 100%);
+            border-right: 2px solid #222;
+            box-shadow: inset 5px 0 10px rgba(0,0,0,0.5);
+        }
+
+        .stripe-right {
+            position: absolute;
+            left: 0;
+            width: 40px;
+            height: 100%;
+            background: linear-gradient(to right, #a81c1c 0%, #a81c1c 40%, #004d2c 40%, #004d2c 100%);
+            border-left: 2px solid #222;
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.5);
+        }
+
+        .brand-label {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #111;
+            color: #d4af37;
+            padding: 10px 30px;
+            border: 2px solid #d4af37;
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            letter-spacing: 4px;
+            z-index: 10;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transition: opacity 0.5s;
+        }
+
+        /* --- The Zipper --- */
+        .zipper-pull {
+            position: absolute;
+            top: 20px; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 70px;
+            background: linear-gradient(to bottom, #d4af37, #aa7c11); 
+            border-radius: 4px;
+            cursor: pointer; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.4);
+            z-index: 61;
+            font-family: 'Playfair Display', serif;
+            font-weight: bold;
+            color: #333;
+            font-size: 20px;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.3);
+            border: 2px solid #664a0a;
+        }
+
+        .zipper-pull:active {
+            cursor: grabbing;
+        }
+        
+        .zipper-pull::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 20px;
+            background: linear-gradient(to bottom, #d4af37, #aa7c11);
+            border-radius: 0 0 10px 10px;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .instruction-text {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            text-align: center;
+            z-index: 10;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .experience-container.unzipped .left-side { transform: translateX(-100%); }
+        .experience-container.unzipped .right-side { transform: translateX(100%); }
+        .experience-container.unzipped .zipper-pull { top: 100% !important; opacity: 0; pointer-events: none; }
+        .experience-container.unzipped .brand-label, 
+        .experience-container.unzipped .instruction-text { opacity: 0; }
+        
+        .hide-bag {
+            display: none !important;
+        }
+
+        /* --- Inside Content (The Reveal) --- */
+        #content-container {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1.5s ease-in-out;
+            min-height: 100vh;
+            background: #fffdf9; /* Beautiful cream color */
+            color: #1a1a1a;
+            padding-bottom: 100px;
+        }
+
+        .show-content {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border: 3px solid #d4af37;
+            background: #000;
+        }
+
+        .video-wrapper iframe, .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- The Interactive Bag Overlay -->
+    <div class="experience-container" id="bagContainer">
+        
+        <div class="brand-label">G & G</div>
+        <div class="instruction-text" id="instruction">
+            Drag Zipper Down <br>
+            <i class="fa-solid fa-chevron-down mt-2 animate-bounce"></i>
+        </div>
+
+        <!-- Left Half of Bag -->
+        <div class="bag-half left-side gucci-pattern">
+            <div class="stripe-left"></div>
+        </div>
+        
+        <!-- The Zipper Pull -->
+        <div class="zipper-pull" id="zipPull">GG</div>
+
+        <!-- Right Half of Bag -->
+        <div class="bag-half right-side gucci-pattern">
+            <div class="stripe-right"></div>
+        </div>
+    </div>
+
+    <!-- The Surprise Content (Hidden Initially) -->
+    <div id="content-container">
+        <div class="max-w-5xl mx-auto pt-20 px-6">
+            
+            <!-- Header Section -->
+            <div class="text-center mb-12 opacity-0 translate-y-10 transition-all duration-1000 delay-500" id="header-text">
+                <h1 class="text-4xl md:text-6xl text-[#1a1a1a] font-serif mb-4 tracking-wide" style="font-family: 'Playfair Display', serif;">Happy 1st Anniversary</h1>
+                <p class="text-[#5a5a5a] text-lg md:text-xl font-light max-w-2xl mx-auto leading-relaxed italic">
+                    "Every picture tells a story, but together they make our beautiful journey. Here is a look back at our favorite moments."
+                </p>
+                <div class="w-24 h-1 bg-[#d4af37] mx-auto mt-6 rounded"></div>
+            </div>
+
+            <!-- Single Video Section -->
+<div class="opacity-0 translate-y-10 transition-all duration-1000 delay-700" id="video-section">
+    <div class="video-wrapper">
+        <!-- Embedded YouTube video placeholder - Fixed URL structure -->
+        <iframe src="./Marriage Anniversary.mp4" title="Our Beautiful Memories" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
+            
+            <!-- Photo Gallery Section using your specific uploaded images -->
+            <div class="mt-16 opacity-0 translate-y-10 transition-all duration-1000 delay-1000" id="gallery-section">
+                 <h2 class="text-3xl font-serif text-center text-[#d4af37] mb-8" style="font-family: 'Playfair Display', serif;">Beautiful Memories</h2>
+                 
+                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                     <!-- Photo 1 -->
+                     <div class="group relative overflow-hidden rounded-xl shadow-lg border-2 border-[#f0ece1] hover:border-[#d4af37] transition-all duration-300">
+                         <img src="./IMG_3135.JPG" alt="Memory 1" class="w-full h-80 object-cover object-top transform group-hover:scale-105 transition-transform duration-500">
+                     </div>
+
+                     <!-- Photo 2 -->
+                     <div class="group relative overflow-hidden rounded-xl shadow-lg border-2 border-[#f0ece1] hover:border-[#d4af37] transition-all duration-300">
+                         <img src="./IMG_3002.jpg" alt="Memory 2" class="w-full h-80 object-cover transform group-hover:scale-105 transition-transform duration-500">
+                     </div>
+
+                     <!-- Photo 3 -->
+                     <div class="group relative overflow-hidden rounded-xl shadow-lg border-2 border-[#f0ece1] hover:border-[#d4af37] transition-all duration-300">
+                         <img src="./IMG_3027.jpg" alt="Memory 3" class="w-full h-80 object-cover  transform group-hover:scale-105 transition-transform duration-500">
+                     </div>
+
+                     <!-- Photo 4 -->
+                     <div class="group relative overflow-hidden rounded-xl shadow-lg border-2 border-[#f0ece1] hover:border-[#d4af37] transition-all duration-300 lg:col-span-1 sm:col-span-2 lg:col-start-auto">
+                         <img src="./IMG_2544.JPG" alt="Memory 4" class="w-full h-80 object-cover object-top transform group-hover:scale-105 transition-transform duration-500">
+                     </div>
+                     
+                     <!-- Photo 5 -->
+                     <div class="group relative overflow-hidden rounded-xl shadow-lg border-2 border-[#f0ece1] hover:border-[#d4af37] transition-all duration-300 lg:col-span-2 sm:col-span-2">
+                         <img src="./6ff6c0ff-26c0-4e9c-a814-1cc08f546342.jpg" alt="Memory 5" class="w-full h-80 object-cover object-top transform group-hover:scale-105 transition-transform duration-500">
+                     </div>
+                 </div>
+            </div>
+
+            <!-- Wishes / Surprises Section -->
+            <div class="mt-16 bg-white p-8 md:p-12 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.05)] border border-[#f0ece1] opacity-0 translate-y-10 transition-all duration-1000 delay-[1200ms]" id="wishes-section">
+                <h2 class="text-3xl font-serif text-center text-[#d4af37] mb-6" style="font-family: 'Playfair Display', serif;">My Promise to You</h2>
+                <div class="text-[#333] space-y-4 text-center text-lg font-light leading-relaxed">
+                    <p>This past year has been nothing short of magical. From our biggest adventures to our quietest moments, every second with you is a gift.</p>
+                    <p>I put together these memories as a reminder of how far we've come. I can't wait to see what our future holds.</p>
+                    <p class="font-medium mt-6 text-[#1a1a1a]">I love you more than words can say.</p>
+                </div>
+            </div>
+
+            <!-- Footer Message -->
+            <div class="mt-20 pb-10 text-center opacity-0 transition-opacity duration-1000 delay-[1400ms]" id="footer-text">
+                <p class="text-xl font-serif italic text-[#5a5a5a] mb-6" style="font-family: 'Playfair Display', serif;">
+                    "Grow old along with me! The best is yet to be."
+                </p>
+                <div class="text-[#d4af37] text-2xl flex justify-center space-x-4 mb-6">
+                    <i class="fa-solid fa-heart"></i>
+                    <i class="fa-solid fa-infinity"></i>
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+                <p class="text-sm uppercase tracking-widest text-gray-400 font-light">Created by AP ❤️</p>
+            </div>
+        
+
+        </div>
+    </div>
+
+    <script>
+        // Global function to trigger the unzipping
+        function unzipExperience() {
+            const bagContainer = document.getElementById('bagContainer');
+            const contentContainer = document.getElementById('content-container');
+            const zipperPull = document.getElementById('zipPull');
+            
+            if(bagContainer.classList.contains('unzipped')) return;
+            
+            // Trigger CSS animations
+            bagContainer.classList.add('unzipped');
+            zipperPull.style.transition = 'top 1s ease-in, opacity 0.5s ease-in 0.5s';
+            zipperPull.style.top = ''; 
+
+            setTimeout(() => {
+                // Show inner content
+                contentContainer.classList.add('show-content');
+                // Allow scrolling on body now that it's open
+                document.body.style.overflow = 'auto';
+                
+                // Fade in elements sequentially
+                setTimeout(() => {
+                    const elements = [
+                        document.getElementById('header-text'),
+                        document.getElementById('video-section'),
+                        document.getElementById('gallery-section'),
+                        document.getElementById('wishes-section')
+                    ];
+                    
+                    elements.forEach(el => {
+                        if (el) el.classList.remove('opacity-0', 'translate-y-10');
+                    });
+                    
+                    const footer = document.getElementById('footer-text');
+                    if(footer) footer.classList.remove('opacity-0');
+                }, 500);
+
+                // Remove bag from DOM completely after animation so it doesn't block clicks
+                setTimeout(() => {
+                    bagContainer.classList.add('hide-bag');
+                }, 1200); 
+
+            }, 300);
+        }
+
+        // Setup Drag and Drop events for both mouse and touch devices
+        document.addEventListener('DOMContentLoaded', () => {
+            const zipperPull = document.getElementById('zipPull');
+            const bagContainer = document.getElementById('bagContainer');
+            const instruction = document.getElementById('instruction');
+            
+            let isDragging = false;
+            let startY = 0;
+            let currentY = 20; // Initial top position
+            let maxDrag = window.innerHeight - 80;
+
+            window.addEventListener('resize', () => {
+                maxDrag = window.innerHeight - 80;
+            });
+
+            const startDrag = (e) => {
+                if(bagContainer.classList.contains('unzipped')) return;
+                isDragging = true;
+                instruction.style.opacity = '0';
+                
+                if (e.type === 'touchstart') {
+                    startY = e.touches[0].clientY - currentY;
+                } else {
+                    startY = e.clientY - currentY;
+                    e.preventDefault();
+                }
+                
+                zipperPull.style.transition = 'none';
+            };
+
+            const drag = (e) => {
+                if (!isDragging || bagContainer.classList.contains('unzipped')) return;
+
+                let clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+                currentY = clientY - startY;
+
+                if (currentY < 20) currentY = 20;
+                if (currentY > maxDrag) currentY = maxDrag;
+
+                zipperPull.style.top = `${currentY}px`;
+
+                // If dragged near the end, trigger open
+                if (currentY > maxDrag * 0.85) {
+                    isDragging = false;
+                    unzipExperience();
+                }
+            };
+
+            const stopDrag = () => {
+                if (!isDragging || bagContainer.classList.contains('unzipped')) return;
+                isDragging = false;
+                
+                if (currentY < maxDrag * 0.85) {
+                    zipperPull.style.transition = 'top 0.3s ease';
+                    instruction.style.opacity = '1';
+                }
+            };
+
+            zipperPull.addEventListener('mousedown', startDrag);
+            window.addEventListener('mousemove', drag);
+            window.addEventListener('mouseup', stopDrag);
+
+            zipperPull.addEventListener('touchstart', startDrag, {passive: false});
+            window.addEventListener('touchmove', drag, {passive: false});
+            window.addEventListener('touchend', stopDrag);
+
+            // Allow click to open as a fallback
+            zipperPull.addEventListener('click', () => {
+                if(currentY === 20) unzipExperience();
+            });
+        });
+    </script>
+</body>
+</html>
